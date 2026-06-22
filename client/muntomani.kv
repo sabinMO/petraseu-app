@@ -1,0 +1,367 @@
+#:kivy 2.2.0
+# Acest fișier se încarcă AUTOMAT de Kivy pentru că se numește la fel ca
+# aplicația (clasa MuntomaniApp -> muntomani.kv), atâta timp cât stă în
+# același folder cu main.py. Nu trebuie să-l încarci manual.
+
+ScreenManager:
+    EcranAcasa:
+    EcranCreare:
+    EcranAlaturare:
+    EcranHarta:
+    EcranEditareTraseu:
+    EcranChat:
+
+
+<EcranAcasa>:
+    name: "acasa"
+
+    MDBoxLayout:
+        orientation: "vertical"
+        padding: "32dp"
+        spacing: "18dp"
+        md_bg_color: app.theme_cls.bg_normal
+
+        Widget:
+            size_hint_y: 0.18
+
+        Image:
+            source: "assets/icon.png"
+            size_hint: None, None
+            size: "120dp", "120dp"
+            pos_hint: {"center_x": 0.5}
+
+        MDLabel:
+            text: "Pe Traseu"
+            font_style: "H3"
+            halign: "center"
+            size_hint_y: None
+            height: self.texture_size[1]
+
+        MDLabel:
+            text: "Vedeți pe hartă unde se află fiecare din echipă"
+            halign: "center"
+            theme_text_color: "Secondary"
+            size_hint_y: None
+            height: self.texture_size[1]
+
+        Widget:
+            size_hint_y: 0.14
+
+        MDRaisedButton:
+            text: "Creează un grup nou"
+            pos_hint: {"center_x": 0.5}
+            size_hint_x: 0.8
+            md_bg_color: 0.91, 0.64, 0.24, 1
+            on_release:
+                app.deschide_ecran("creare")
+
+        MDFlatButton:
+            text: "Alătură-te unui grup existent"
+            pos_hint: {"center_x": 0.5}
+            size_hint_x: 0.8
+            on_release:
+                app.deschide_ecran("alaturare")
+
+        Widget:
+            size_hint_y: 0.3
+
+        MDFlatButton:
+            text: "Ieși din aplicație"
+            pos_hint: {"center_x": 0.5}
+            theme_text_color: "Secondary"
+            on_release:
+                app.iesi_din_aplicatie()
+
+        Widget:
+            size_hint_y: 0.06
+
+
+<EcranCreare>:
+    name: "creare"
+
+    MDBoxLayout:
+        orientation: "vertical"
+
+        MDTopAppBar:
+            title: "Grup nou"
+            left_action_items: [["arrow-left", lambda x: app.deschide_ecran("acasa")]]
+
+        ScrollView:
+
+            MDBoxLayout:
+                id: container_creare
+                orientation: "vertical"
+                size_hint_y: None
+                height: self.minimum_height
+                padding: ["24dp", "16dp"]
+                spacing: "12dp"
+
+                MDLabel:
+                    text: "Detalii grup"
+                    font_style: "Subtitle1"
+                    bold: True
+                    size_hint_y: None
+                    height: self.texture_size[1]
+                    theme_text_color: "Custom"
+                    text_color: 0.91, 0.64, 0.24, 1
+
+                MDTextField:
+                    id: camp_nume_grup
+                    hint_text: "Numele grupului (ex: Drumeție Bucegi)"
+
+                MDTextField:
+                    id: camp_nume_organizator
+                    hint_text: "Numele tău"
+
+                MDLabel:
+                    text: "Traseu (opțional)"
+                    font_style: "Subtitle1"
+                    bold: True
+                    size_hint_y: None
+                    height: self.texture_size[1] + dp(8)
+                    theme_text_color: "Custom"
+                    text_color: 0.91, 0.64, 0.24, 1
+
+                MDLabel:
+                    text: "Adaugă un traseu acum sau mai târziu, de pe ecranul hărții."
+                    font_style: "Caption"
+                    theme_text_color: "Secondary"
+                    size_hint_y: None
+                    height: self.texture_size[1] + dp(4)
+
+                MDBoxLayout:
+                    id: container_puncte_traseu
+                    orientation: "vertical"
+                    size_hint_y: None
+                    height: self.minimum_height
+                    spacing: "6dp"
+
+                MDLabel:
+                    id: eticheta_eroare_creare
+                    text: ""
+                    theme_text_color: "Error"
+                    halign: "center"
+                    size_hint_y: None
+                    height: self.texture_size[1] + dp(4)
+
+        MDRaisedButton:
+            text: "Creează grupul"
+            pos_hint: {"center_x": 0.5}
+            size_hint_x: 0.85
+            md_bg_color: 0.91, 0.64, 0.24, 1
+            on_release: app.creeaza_grup()
+
+        Widget:
+            size_hint_y: None
+            height: "12dp"
+
+
+<EcranAlaturare>:
+    name: "alaturare"
+
+    MDBoxLayout:
+        orientation: "vertical"
+
+        MDTopAppBar:
+            title: "Alătură-te unui grup"
+            left_action_items: [["arrow-left", lambda x: app.deschide_ecran("acasa")]]
+
+        MDBoxLayout:
+            orientation: "vertical"
+            padding: "32dp"
+            spacing: "16dp"
+
+            Widget:
+                size_hint_y: 0.1
+
+            MDTextField:
+                id: camp_cod
+                hint_text: "Codul grupului (primit de la organizator)"
+
+            MDTextField:
+                id: camp_nume_alaturare
+                hint_text: "Numele tău"
+
+            MDLabel:
+                id: eticheta_eroare_alaturare
+                text: ""
+                theme_text_color: "Error"
+                size_hint_y: None
+                height: self.texture_size[1]
+
+            MDRaisedButton:
+                text: "Alătură-te"
+                pos_hint: {"center_x": 0.5}
+                md_bg_color: 0.91, 0.64, 0.24, 1
+                on_release:
+                    app.alatura_grup()
+
+            Widget:
+
+
+<EcranHarta>:
+    name: "harta"
+
+    MDBoxLayout:
+        orientation: "vertical"
+
+        MDTopAppBar:
+            id: bara_harta
+            title: "Grup"
+            left_action_items: [["arrow-left", lambda x: app.confirma_iesire()]]
+            # right_action_items se setează din Python (EcranHarta.on_enter) - diferă
+            # între organizator (vede traseu + ștergere) și participant (vede doar chat)
+
+        MDBoxLayout:
+            id: container_harta
+            orientation: "vertical"
+            # Harta (MapView) se adaugă aici din Python, la intrarea pe ecran
+
+        ScrollView:
+            id: derulare_legenda
+            size_hint_y: None
+            height: "40dp"
+            do_scroll_x: True
+            do_scroll_y: False
+
+            MDBoxLayout:
+                id: legenda_participanti
+                size_hint_x: None
+                width: self.minimum_width
+                padding: ["10dp", "4dp"]
+                spacing: "16dp"
+
+        MDBoxLayout:
+            size_hint_y: None
+            height: "44dp"
+            padding: ["12dp", 0]
+            spacing: "6dp"
+            md_bg_color: app.theme_cls.bg_dark
+
+            MDLabel:
+                id: eticheta_cod_grup
+                text: "Cod grup: ----"
+                theme_text_color: "Secondary"
+
+            MDIconButton:
+                icon: "content-copy"
+                theme_text_color: "Custom"
+                text_color: 0.91, 0.64, 0.24, 1
+                on_release: app.copiaza_cod_grup()
+
+        MDBoxLayout:
+            id: bara_editare_traseu
+            size_hint_y: None
+            height: "0dp"
+            padding: ["12dp", "4dp"]
+            md_bg_color: 0.09, 0.19, 0.16, 1
+
+            MDFlatButton:
+                id: buton_editare_traseu
+                text: "Schimbă traseul"
+                theme_text_color: "Custom"
+                text_color: 0.91, 0.64, 0.24, 1
+                on_release: app.deschide_ecran("editare_traseu")
+
+        MDBoxLayout:
+            id: bara_alerta_urs
+            size_hint_y: None
+            height: "0dp"
+            padding: ["16dp", "8dp"]
+            spacing: "8dp"
+            md_bg_color: 0.7, 0.1, 0.1, 1
+
+            MDLabel:
+                id: text_alerta_urs
+                text: ""
+                bold: True
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+
+            MDIconButton:
+                icon: "close"
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+                size_hint_x: None
+                width: "40dp"
+                on_release: app.anuleaza_alerta_urs()
+
+<EcranEditareTraseu>:
+    name: "editare_traseu"
+
+    MDBoxLayout:
+        orientation: "vertical"
+
+        MDTopAppBar:
+            title: "Editează traseul"
+            left_action_items: [["arrow-left", lambda x: app.deschide_ecran("harta")]]
+
+        ScrollView:
+            MDBoxLayout:
+                id: container_puncte_et
+                orientation: "vertical"
+                size_hint_y: None
+                height: self.minimum_height
+                padding: ["24dp", "16dp"]
+                spacing: "6dp"
+
+        MDLabel:
+            id: eticheta_eroare_et
+            text: ""
+            theme_text_color: "Error"
+            halign: "center"
+            size_hint_y: None
+            height: self.texture_size[1] + dp(4)
+
+        MDRaisedButton:
+            text: "Salvează traseul"
+            pos_hint: {"center_x": 0.5}
+            size_hint_x: 0.85
+            md_bg_color: 0.91, 0.64, 0.24, 1
+            on_release: app.root.get_screen("editare_traseu").salveaza_traseul()
+
+        Widget:
+            size_hint_y: None
+            height: "12dp"
+
+
+<EcranChat>:
+    name: "chat"
+
+
+    MDBoxLayout:
+        orientation: "vertical"
+
+        MDTopAppBar:
+            title: "Chat grup"
+            left_action_items: [["arrow-left", lambda x: app.deschide_ecran("harta")]]
+
+        ScrollView:
+            id: derulare_mesaje
+
+            MDBoxLayout:
+                id: container_mesaje
+                orientation: "vertical"
+                size_hint_y: None
+                height: self.minimum_height
+                padding: "12dp"
+                spacing: "10dp"
+
+        MDBoxLayout:
+            size_hint_y: None
+            height: "56dp"
+            padding: ["8dp", "4dp"]
+            spacing: "8dp"
+            md_bg_color: app.theme_cls.bg_dark
+
+            MDTextField:
+                id: camp_mesaj
+                hint_text: "Scrie un mesaj..."
+                multiline: False
+                on_text_validate: app.trimite_mesaj_chat()
+
+            MDIconButton:
+                icon: "send"
+                theme_text_color: "Custom"
+                text_color: 0.91, 0.64, 0.24, 1
+                on_release: app.trimite_mesaj_chat()

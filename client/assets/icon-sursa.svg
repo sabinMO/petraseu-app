@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <radialGradient id="bg" cx="35%" cy="28%" r="85%">
+      <stop offset="0%" stop-color="#2B4F40"/>
+      <stop offset="100%" stop-color="#16302B"/>
+    </radialGradient>
+  </defs>
+
+  <!-- fundal rotunjit, tip iconiță de aplicație -->
+  <rect x="0" y="0" width="200" height="200" rx="46" fill="url(#bg)"/>
+
+  <!-- silueta muntelui -->
+  <path d="M34,152 L82,78 L102,104 L132,52 L172,152 Z" fill="#F4EFE3"/>
+  <path d="M132,52 L122,67 L142,67 Z" fill="#FFFFFF" opacity="0.85"/>
+
+  <!-- coarda care leagă grupul -->
+  <path d="M64,130 Q86,114 98,96 Q118,84 131,84"
+        fill="none" stroke="#E8A33D" stroke-width="4"
+        stroke-linecap="round" stroke-dasharray="1.5 7.5"/>
+
+  <!-- drumeț 1 - mers animat -->
+  <g transform="translate(64,134) scale(1.05)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0,0; 0,-3.5; 0,0" dur="1.05s" repeatCount="indefinite"/>
+      <circle cx="0" cy="-13" r="5" fill="#E2725B" stroke="#16302B" stroke-width="1.5"/>
+      <path d="M0,-8 L0,3" stroke="#E2725B" stroke-width="4" stroke-linecap="round"/>
+      <path d="M0,-6 L-6,-1" stroke="#E2725B" stroke-width="3.2" stroke-linecap="round"/>
+      <path d="M0,-6 L6,-2" stroke="#E2725B" stroke-width="3.2" stroke-linecap="round"/>
+      <path d="M0,3 L-6,13" stroke="#E2725B" stroke-width="4" stroke-linecap="round"/>
+      <path d="M0,3 L7,12" stroke="#E2725B" stroke-width="4" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <!-- drumeț 2 - mers animat, pas oglindit -->
+  <g transform="translate(98,98) scale(1.0)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0,0; 0,-3.5; 0,0" dur="1.05s" begin="0.35s" repeatCount="indefinite"/>
+      <circle cx="0" cy="-13" r="5" fill="#5AA9E6" stroke="#16302B" stroke-width="1.5"/>
+      <path d="M0,-8 L0,3" stroke="#5AA9E6" stroke-width="4" stroke-linecap="round"/>
+      <path d="M0,-6 L6,-1" stroke="#5AA9E6" stroke-width="3.2" stroke-linecap="round"/>
+      <path d="M0,-6 L-6,-2" stroke="#5AA9E6" stroke-width="3.2" stroke-linecap="round"/>
+      <path d="M0,3 L6,13" stroke="#5AA9E6" stroke-width="4" stroke-linecap="round"/>
+      <path d="M0,3 L-7,12" stroke="#5AA9E6" stroke-width="4" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <!-- puls de localizare in jurul celui din vârf -->
+  <circle cx="131" cy="57" r="15" fill="none" stroke="#F2C14E" stroke-width="2" opacity="0.6">
+    <animate attributeName="r" values="15;30;15" dur="2.2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.6;0;0.6" dur="2.2s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- drumețul din vârf, ca pin de localizare cu siluetă de om -->
+  <path d="M131,89 C121,75 116,67 116,58 A15,15 0 1,1 146,58 C146,67 141,75 131,89 Z"
+        fill="#F2C14E" stroke="#16302B" stroke-width="3"/>
+  <circle cx="131" cy="51" r="3.4" fill="#16302B"/>
+  <path d="M123,63 a8,8 0 0 1 16,0 z" fill="#16302B"/>
+</svg>
