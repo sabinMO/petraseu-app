@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout cod
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setează Python 3.10
         uses: actions/setup-python@v4
@@ -27,7 +27,7 @@ jobs:
         run: pip install buildozer==1.5.0 cython==0.29.37
 
       - name: Cache Android SDK/NDK
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.buildozer/android/platform/android-sdk
@@ -39,7 +39,7 @@ jobs:
         run: yes | buildozer android debug 2>&1
 
       - name: Urcă APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: PeTraseu-debug-apk
           path: client/bin/*.apk
