@@ -10,35 +10,43 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - name: Checkout cod
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
 
-      - name: Setează Python 3.10
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
-      - name: Instalează dependențe sistem
+      - name: Dependente sistem
         run: |
           sudo apt-get update
           sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev build-essential
 
-      - name: Instalează Buildozer și Cython
+      - name: Buildozer si Cython
         run: pip install buildozer==1.5.0 cython==0.29.37
 
-      - name: Cache Android SDK/NDK
+      - name: Cache SDK/NDK
         uses: actions/cache@v4
         with:
-          path: |
-            ~/.buildozer/android/platform/android-sdk
-            ~/.buildozer/android/platform/android-ndk-r25b
-          key: android-sdk-ndk-v1
+          path: ~/.buildozer
+          key: buildozer-cache-v2
 
-      - name: Compilează APK
+      - name: Compileaza APK
         working-directory: client
         run: yes | buildozer android debug 2>&1
 
-      - name: Urcă APK
+      - name: Arata eroarea daca pica
+        if: failure()
+        working-directory: client
+        run: |
+          echo "=== LAST 300 LINES OF BUILDOZER LOG ==="
+          find .buildozer -name "*.log" 2>/dev/null | xargs tail -300 2>/dev/null || echo "No log found"
+          echo "=== BIN FOLDER ==="
+          ls -la bin/ 2>/dev/null || echo "No bin folder"
+
+      - name: Urca APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: PeTraseu-debug-apk
