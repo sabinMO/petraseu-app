@@ -49,6 +49,20 @@ jobs:
         working-directory: client
         run: yes | buildozer android debug 2>&1
 
+      - name: Salveaza log complet
+        if: always()
+        working-directory: client
+        run: |
+          find .buildozer -name "*.log" 2>/dev/null | xargs cat 2>/dev/null | tail -500 > /tmp/build_tail.log || true
+          cat /tmp/build_tail.log
+
+      - name: Upload log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: buildozer-full-log
+          path: /tmp/build_tail.log
+
       - name: Upload APK
         if: success()
         uses: actions/upload-artifact@v4
