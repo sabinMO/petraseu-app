@@ -26,6 +26,9 @@ android.ndk = 25b
 android.build_tools_version = 33.0.3
 android.accept_sdk_license = True
 android.archs = arm64-v8a
+android.sdk_path = /usr/local/lib/android/sdk
+android.ndk_path = /usr/local/lib/android/sdk/ndk/27.3.13750724
+android.ndk_version = 27.3.13750724
 [buildozer]
 log_level = 2
 warn_on_root = 1
