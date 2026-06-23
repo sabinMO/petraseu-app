@@ -7,24 +7,64 @@ on:
 
 jobs:
   build-apk:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: false
 
-      - name: Build APK cu Docker Kivy
-        uses: ArtemSBulgakov/buildozer-action@v1
-        id: buildozer
+      - name: Setup Python 3.10
+        uses: actions/setup-python@v4
         with:
-          command: android debug
-          workdir: client
-          buildozer_version: stable
+          python-version: "3.10"
 
-      - name: Urca APK
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            git zip unzip \
+            openjdk-17-jdk \
+            autoconf libtool pkg-config \
+            zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 \
+            cmake libffi-dev libssl-dev build-essential \
+            libltdl-dev
+
+      - name: Install buildozer
+        run: |
+          pip install --upgrade pip
+          pip install buildozer==1.5.0
+          pip install cython==0.29.37
+
+      - name: Clean previous build
+        run: rm -rf client/.buildozer
+
+      - name: Cache Android SDK NDK
+        uses: actions/cache@v4
+        with:
+          path: ~/.buildozer
+          key: android-cache-${{ runner.os }}-v5
+
+      - name: Build APK
+        working-directory: client
+        env:
+          PYTHONPATH: ""
+        run: |
+          yes | buildozer android debug 2>&1
+
+      - name: Show error log if failed
+        if: failure()
+        working-directory: client
+        run: |
+          find .buildozer -name "*.log" 2>/dev/null | while read f; do
+            echo "=== $f ==="
+            tail -200 "$f"
+          done
+
+      - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: PeTraseu-debug-apk
-          path: ${{ steps.buildozer.outputs.filename }}
+          path: client/bin/*.apk
           retention-days: 30
