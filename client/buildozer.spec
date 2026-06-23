@@ -23,6 +23,7 @@ android.permissions = INTERNET,ACCESS_FINE_LOCATION,ACCESS_COARSE_LOCATION
 android.api = 33
 android.minapi = 26
 android.ndk = 25b
+android.build_tools_version = 33.0.2
 android.archs = arm64-v8a
 
 [buildozer]
