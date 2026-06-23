@@ -13,7 +13,7 @@ version = 0.1
 
 # IMPORTANT: kivy_garden.mapview e cel mai sensibil pachet de aici la build.
 # Dacă apar erori legate de el, vezi secțiunea "Probleme frecvente" din README.md.
-requirements = python3,kivy==2.2.1,kivymd==1.1.1,plyer,requests,kivy_garden.mapview,certifi,urllib3,idna,charset_normalizer,cython
+requirements = python3,kivy==2.2.1,kivymd==1.1.1,plyer,requests,kivy_garden.mapview,certifi,urllib3,idna,charset_normalizer
 orientation = portrait
 fullscreen = 0
 
