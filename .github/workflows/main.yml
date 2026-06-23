@@ -47,10 +47,9 @@ jobs:
 
       - name: Fix sdkmanager path
         run: |
-          mkdir -p /usr/local/lib/android/sdk/tools/bin
-          ln -sf /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager \
+          sudo mkdir -p /usr/local/lib/android/sdk/tools/bin
+          sudo ln -sf /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager \
                  /usr/local/lib/android/sdk/tools/bin/sdkmanager
-          chmod +x /usr/local/lib/android/sdk/tools/bin/sdkmanager
 
       - name: Build APK
         working-directory: client
