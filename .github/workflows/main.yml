@@ -31,6 +31,9 @@ jobs:
         with:
           path: ~/.buildozer
           key: buildozer-cache-v2
+          
+      - name: Curata cache buildozer
+        run: rm -rf ~/.buildozer/android/platform/build-arm64-v8a
 
       - name: Compileaza APK
         working-directory: client
