@@ -14,14 +14,40 @@ jobs:
         with:
           submodules: false
 
-      - name: Build APK cu imaginea oficiala Kivy
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Dependente sistem
         run: |
-          docker run --rm \
-            -v ${{ github.workspace }}/client:/home/user/hostcwd \
-            kivy/buildozer:latest \
-            android debug
+          sudo apt-get update
+          sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev build-essential
+
+      - name: Instaleaza Buildozer
+        run: pip install buildozer==1.5.0 cython==0.29.37
+
+      - name: Accepta licente Android SDK
+        run: |
+          mkdir -p ~/.android
+          touch ~/.android/repositories.cfg
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || true
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;33.0.3" 2>/dev/null || true
+
+      - name: Cache buildozer
+        uses: actions/cache@v4
+        with:
+          path: ~/.buildozer
+          key: buildozer-${{ runner.os }}-v7
+
+      - name: Curata build vechi
+        run: rm -rf client/.buildozer
+
+      - name: Build APK
+        working-directory: client
+        run: yes | buildozer android debug 2>&1
 
       - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: PeTraseu-debug-apk
