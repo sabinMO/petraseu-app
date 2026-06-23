@@ -18,6 +18,12 @@ jobs:
         with:
           python-version: "3.10"
 
+      - name: Verifica Python
+        run: |
+          python --version
+          which python
+          pip --version
+
       - name: Dependente sistem
         run: |
           sudo apt-get update
@@ -30,7 +36,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.buildozer
-          key: buildozer-cache-v2
+          key: buildozer-cache-v3
           
       - name: Curata cache buildozer
         run: rm -rf ~/.buildozer/android/platform/build-arm64-v8a
