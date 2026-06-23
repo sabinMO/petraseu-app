@@ -59,7 +59,11 @@ jobs:
         if: always()
         working-directory: client
         run: |
-          find .buildozer -name "*.log" 2>/dev/null | xargs cat 2>/dev/null | tail -500 > /tmp/build_tail.log || true
+          find .buildozer -name "*.txt" -path "*/build*" 2>/dev/null | head -5
+          find .buildozer -type f -name "*.log" 2>/dev/null | head -10
+          ls -la .buildozer/ 2>/dev/null || echo "No .buildozer folder"
+          cat .buildozer/android/platform/build-arm64-v8a/dists/petraseu__arm64-v8a/build/outputs/apk/debug/*.txt 2>/dev/null || true
+          grep -r "ERROR\|Error\|error\|FAILED\|failed" .buildozer/ 2>/dev/null | grep -v "Binary\|jpeg\|png\|#" | tail -100 > /tmp/build_tail.log || echo "no errors found" > /tmp/build_tail.log
           cat /tmp/build_tail.log
 
       - name: Upload log
