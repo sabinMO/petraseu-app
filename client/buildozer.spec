@@ -1,21 +1,28 @@
-[app] 
-title = Pe Traseu 
+[app]
+title = Pe Traseu
 package.name = petraseu
-package.domain = org.petraseu 
- source.dir = . 
- source.include_exts = py,png,jpg,kv,atlas 
- source.include_patterns = assets/markers/*.png,assets/icon.png
-  icon.filename = %(source.dir)s/assets/icon.png 
-  version = 0.1 
-  requirements = python3,kivy==2.2.1,kivymd==1.1.1,plyer,requests,certifi,urllib3,idna,charset_normalizer,kivy_garden.mapview 
-  orientation = portrait 
-  fullscreen = 0 
-  android.permissions = 
-  INTERNET,ACCESS_FINE_LOCATION,ACCESS_COARSE_LOCATION,ACCESS_NETWORK_STATE 
-  android.api = 33 
-  android.minapi = 26 
-  android.ndk = 25b 
-  android.archs = arm64-v8a 
-  [buildozer] 
-  log_level = 2 
-  warn_on_root = 1
+package.domain = org.petraseu
+
+source.dir = .
+source.include_exts = py,png,jpg,kv,atlas
+source.include_patterns = assets/markers/*.png,assets/icon.png
+
+icon.filename = %(source.dir)s/assets/icon.png
+
+version = 0.1
+
+requirements = python3,kivy==2.2.1,kivymd==1.1.1,plyer,requests,certifi,urllib3,idna,charset_normalizer,kivy_garden.mapview
+
+orientation = portrait
+fullscreen = 0
+
+android.permissions = INTERNET,ACCESS_FINE_LOCATION,ACCESS_COARSE_LOCATION,ACCESS_NETWORK_STATE
+
+android.api = 33
+android.minapi = 26
+android.ndk = 25b
+android.archs = arm64-v8a
+
+[buildozer]
+log_level = 2
+warn_on_root = 1
