@@ -30,24 +30,21 @@ jobs:
           pip install cython==0.29.37
           pip install "python-for-android==2023.09.16"
 
-          - name: Pre-accepta licente buildozer SDK
-        run: |
-          mkdir -p ~/.buildozer/android/platform/android-sdk
-          touch ~/.android/repositories.cfg
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk --licenses || true
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "build-tools;33.0.3" "platforms;android-33" "platform-tools" || true
       - name: Accepta licente SDK
         run: |
           mkdir -p ~/.android
           touch ~/.android/repositories.cfg
-          mkdir -p ~/.buildozer/android/platform/android-sdk
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || true
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;33.0.3" "platforms;android-33" "platform-tools" 2>/dev/null || true
+          mkdir -p ~/.buildozer/android/platform/android-sdk
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk --licenses || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "build-tools;33.0.3" "platforms;android-33" "platform-tools" || true
+
       - name: Cache buildozer
         uses: actions/cache@v4
         with:
           path: ~/.buildozer
-          key: buildozer-${{ runner.os }}-ndk25b-v9
+          key: buildozer-${{ runner.os }}-ndk25b-v10
 
       - name: Curata build vechi
         run: rm -rf client/.buildozer
@@ -63,12 +60,6 @@ jobs:
           ls -la client/bin/ 2>/dev/null || echo "Nu exista client/bin/"
           echo "=== ULTIMELE 50 LINII BUILD ==="
           tail -50 /tmp/build.log
-
-      - name: Arata ultimele erori
-        if: always()
-        run: |
-          echo "=== ULTIMELE ERORI ==="
-          grep -E "\[ERROR\]|\[CRITICAL\]|Error:|error:|Traceback|FAILED" /tmp/build.log | grep -v "^#\|evdev\|gevent\|aubio\|secp\|vlc" | tail -100
 
       - name: Upload APK
         if: success()
