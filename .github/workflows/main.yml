@@ -51,7 +51,14 @@ jobs:
       - name: Build APK
         working-directory: client
         run: yes | buildozer android debug 2>&1 | tee /tmp/build.log
-        continue-on-error: true
+
+      - name: Verifica APK
+        if: always()
+        run: |
+          echo "=== BIN FOLDER ==="
+          ls -la client/bin/ 2>/dev/null || echo "Nu exista client/bin/"
+          echo "=== ULTIMELE 50 LINII BUILD ==="
+          tail -50 /tmp/build.log
 
       - name: Arata ultimele erori
         if: always()
