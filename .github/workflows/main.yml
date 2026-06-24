@@ -31,12 +31,11 @@ jobs:
           pip install "python-for-android==2023.09.16"
 
           - name: Pre-accepta licente buildozer SDK
-          run: |
-          mkdir -p ~/.buildozer/android/platform/android-sdk/.android
-          touch ~/.buildozer/android/platform/android-sdk/.android/repositories.cfg
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk --licenses 2>/dev/null || true
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "build-tools;33.0.3" "platforms;android-33" "cmdline-tools;latest" "platform-tools" 2>/dev/null || true
-
+        run: |
+          mkdir -p ~/.buildozer/android/platform/android-sdk
+          touch ~/.android/repositories.cfg
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk --licenses || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "build-tools;33.0.3" "platforms;android-33" "platform-tools" || true
       - name: Accepta licente SDK
         run: |
           mkdir -p ~/.android
