@@ -3,79 +3,50 @@ name: Build Pe Traseu APK
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:
+  workflow_dispatch:  # permite rularea manuală din interfața GitHub
 
 jobs:
   build-apk:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-22.04  # Python 3.10 - singurul compatibil 100% cu Kivy/Buildozer
 
     steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: false
+      - name: Checkout cod
+        uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v4
+      - name: Setează Python 3.10
+        uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
-      - name: Dependente sistem
+      - name: Instalează dependențe sistem
         run: |
           sudo apt-get update
-          sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev build-essential
+          sudo apt-get install -y \
+            git zip unzip \
+            openjdk-17-jdk \
+            autoconf libtool pkg-config \
+            zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 \
+            cmake libffi-dev libssl-dev \
+            build-essential
 
-      - name: Instaleaza Buildozer
+      - name: Instalează Buildozer și Cython
         run: pip install buildozer==1.5.0 cython==0.29.37
 
-      - name: Accepta licente Android SDK
-        run: |
-          mkdir -p ~/.android
-          touch ~/.android/repositories.cfg
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
-            "build-tools;33.0.3" \
-            "platforms;android-33" \
-            "platform-tools" || true
-
-      - name: Cache buildozer
-        uses: actions/cache@v4
+      - name: Cache Android SDK/NDK
+        uses: actions/cache@v3
         with:
-          path: ~/.buildozer
-          key: buildozer-${{ runner.os }}-v7
+          path: |
+            ~/.buildozer/android/platform/android-sdk
+            ~/.buildozer/android/platform/android-ndk-r25b
+          key: android-sdk-ndk-${{ runner.os }}-v1
 
-      - name: Curata build vechi
-        run: rm -rf client/.buildozer
-
-      - name: Fix sdkmanager path
-        run: |
-          sudo mkdir -p /usr/local/lib/android/sdk/tools/bin
-          sudo ln -sf /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager \
-                 /usr/local/lib/android/sdk/tools/bin/sdkmanager
-
-      - name: Build APK
-        working-directory: client
-        run: yes | buildozer android debug 2>&1
-
-      - name: Salveaza log complet
-        if: always()
+      - name: Compilează APK
         working-directory: client
         run: |
-          find .buildozer -name "*.txt" -path "*/build*" 2>/dev/null | head -5
-          find .buildozer -type f -name "*.log" 2>/dev/null | head -10
-          ls -la .buildozer/ 2>/dev/null || echo "No .buildozer folder"
-          cat .buildozer/android/platform/build-arm64-v8a/dists/petraseu__arm64-v8a/build/outputs/apk/debug/*.txt 2>/dev/null || true
-          grep -r "ERROR\|Error\|error\|FAILED\|failed" .buildozer/ 2>/dev/null | grep -v "Binary\|jpeg\|png\|#" | tail -100 > /tmp/build_tail.log || echo "no errors found" > /tmp/build_tail.log
-          cat /tmp/build_tail.log
+          yes | buildozer android debug 2>&1
 
-      - name: Upload log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: buildozer-full-log
-          path: /tmp/build_tail.log
-
-      - name: Upload APK
-        if: success()
-        uses: actions/upload-artifact@v4
+      - name: Urcă APK ca artifact
+        uses: actions/upload-artifact@v3
         with:
           name: PeTraseu-debug-apk
           path: client/bin/*.apk
