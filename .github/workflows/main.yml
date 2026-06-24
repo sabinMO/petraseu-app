@@ -30,15 +30,20 @@ jobs:
           pip install cython==0.29.37
           pip install "python-for-android==2023.09.16"
 
+          - name: Pre-accepta licente buildozer SDK
+          run: |
+          mkdir -p ~/.buildozer/android/platform/android-sdk/.android
+          touch ~/.buildozer/android/platform/android-sdk/.android/repositories.cfg
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk --licenses 2>/dev/null || true
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "build-tools;33.0.3" "platforms;android-33" "cmdline-tools;latest" "platform-tools" 2>/dev/null || true
+
       - name: Accepta licente SDK
         run: |
           mkdir -p ~/.android
           touch ~/.android/repositories.cfg
+          mkdir -p ~/.buildozer/android/platform/android-sdk
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || true
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;33.0.3" "platforms;android-33" "platform-tools" 2>/dev/null || true
-          sudo mkdir -p /usr/local/lib/android/sdk/tools/bin
-          sudo ln -sf $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager /usr/local/lib/android/sdk/tools/bin/sdkmanager 2>/dev/null || true
-
       - name: Cache buildozer
         uses: actions/cache@v4
         with:
