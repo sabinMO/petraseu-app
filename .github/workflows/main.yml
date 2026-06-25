@@ -79,7 +79,7 @@ jobs:
           buildozer android debug 2>&1 | tee ../build.log
 
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: pe-traseu-apk
