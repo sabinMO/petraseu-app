@@ -34,12 +34,16 @@ jobs:
         run: |
           mkdir -p ~/.android
           touch ~/.android/repositories.cfg
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || true
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;33.0.3" "platforms;android-33" "platform-tools" 2>/dev/null || true
-          mkdir -p ~/.buildozer/android/platform/android-sdk
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk --licenses || true
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "build-tools;33.0.3" "platforms;android-33" "platform-tools" || true
-
+          mkdir -p ~/.buildozer/android/platform/android-sdk/tools/bin
+          mkdir -p ~/.buildozer/android/platform/android-sdk/cmdline-tools
+          cp -r $ANDROID_HOME/cmdline-tools/latest \
+            ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest
+          ln -sf ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager \
+            ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
+          yes | ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          yes | ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager \
+            "build-tools;33.0.3" "platforms;android-33" "platform-tools" || true
+            
       - name: Cache buildozer
         uses: actions/cache@v4
         with:
