@@ -10,65 +10,79 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: false
+      - uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v4
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
+          python-version: '3.10'
 
-      - name: Dependente sistem
+      - name: Instaleaza dependinte sistem
         run: |
           sudo apt-get update
-          sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev build-essential
+          sudo apt-get install -y \
+            git zip unzip openjdk-17-jdk \
+            autoconf libtool pkg-config \
+            zlib1g-dev libncurses5-dev libncursesw5-dev \
+            libffi-dev libssl-dev
 
-      - name: Instaleaza Buildozer si p4a
+      - name: Instaleaza buildozer si dependinte Python
         run: |
           pip install --upgrade pip
           pip install buildozer==1.5.0
-          pip install cython==0.29.37
-          pip install "python-for-android==2023.09.16"
+          pip install cython==0.29.33
 
-      - name: Accepta licente SDK
-        run: |
-          mkdir -p ~/.android
-          touch ~/.android/repositories.cfg
-          mkdir -p ~/.buildozer/android/platform/android-sdk/tools/bin
-          mkdir -p ~/.buildozer/android/platform/android-sdk/cmdline-tools
-          cp -r $ANDROID_HOME/cmdline-tools/latest \
-            ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest
-          ln -sf ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager \
-            ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
-          yes | ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          yes | ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager \
-            "build-tools;33.0.3" "platforms;android-33" "platform-tools" || true
-            
       - name: Cache buildozer
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           path: ~/.buildozer
-          key: buildozer-${{ runner.os }}-ndk25b-v10
+          key: buildozer-${{ runner.os }}-${{ hashFiles('client/buildozer.spec') }}
+          restore-keys: |
+            buildozer-${{ runner.os }}-
 
-      - name: Curata build vechi
-        run: rm -rf client/.buildozer
+      - name: Setup Android SDK complet
+        run: |
+          SDK_ROOT=~/.buildozer/android/platform/android-sdk
+          mkdir -p "$SDK_ROOT"
+
+          # Descarca cmdline-tools
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O /tmp/cmdline-tools.zip
+          mkdir -p "$SDK_ROOT/cmdline-tools"
+          unzip -q /tmp/cmdline-tools.zip -d "$SDK_ROOT/cmdline-tools"
+          mv "$SDK_ROOT/cmdline-tools/cmdline-tools" "$SDK_ROOT/cmdline-tools/latest" 2>/dev/null || true
+
+          SDKMANAGER="$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+
+          # Accepta licente
+          mkdir -p ~/.android
+          touch ~/.android/repositories.cfg
+          yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses || true
+
+          # Instaleaza componentele necesare
+          yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" \
+            "platforms;android-33" \
+            "build-tools;33.0.3" \
+            "platform-tools" || true
+
+          # Symlink pentru calea veche tools/bin/sdkmanager
+          mkdir -p "$SDK_ROOT/tools/bin"
+          ln -sf "$SDKMANAGER" "$SDK_ROOT/tools/bin/sdkmanager"
+
+          echo "=== Verificare ==="
+          ls -la "$SDK_ROOT/tools/bin/"
+          ls -la "$SDK_ROOT/build-tools/" || true
+          "$SDKMANAGER" --sdk_root="$SDK_ROOT" --list | head -20 || true
 
       - name: Build APK
         working-directory: client
-        run: yes | buildozer android debug 2>&1 | tee /tmp/build.log
-
-      - name: Verifica APK
-        if: always()
         run: |
-          echo "=== BIN FOLDER ==="
-          ls -la client/bin/ 2>/dev/null || echo "Nu exista client/bin/"
-          echo "=== ULTIMELE 50 LINII BUILD ==="
-          tail -50 /tmp/build.log
+          buildozer android debug 2>&1 | tee ../build.log
 
       - name: Upload APK
-        if: success()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
+        if: always()
         with:
-          name: PeTraseu-debug-apk
-          path: client/bin/*.apk
-          retention-days: 30
+          name: pe-traseu-apk
+          path: |
+            client/bin/*.apk
+            build.log
