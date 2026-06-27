@@ -11,7 +11,7 @@ icon.filename = %(source.dir)s/assets/icon.png
 
 version = 0.1
 
-requirements = python3,kivy==2.2.1,kivymd==1.1.1,plyer,requests,certifi,urllib3,idna,charset_normalizer,kivy_garden.mapview
+requirements = python3,kivy==2.2.1,kivymd==1.1.1,plyer,requests,certifi,urllib3,idna,charset_normalizer
 
 orientation = portrait
 fullscreen = 0
