@@ -47,6 +47,7 @@ jobs:
           wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O /tmp/cmdline-tools.zip
           mkdir -p "$SDK_ROOT/cmdline-tools"
           unzip -o -q /tmp/cmdline-tools.zip -d /tmp/cmdline-tools-extracted
+           rm -rf "$SDK_ROOT/cmdline-tools/latest"
           mv /tmp/cmdline-tools-extracted/cmdline-tools "$SDK_ROOT/cmdline-tools/latest"
 
           SDKMANAGER="$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
