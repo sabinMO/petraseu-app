@@ -75,8 +75,9 @@ jobs:
 
       - name: Build APK
         working-directory: client
+        env:
+          P4A_PYTHON_VERSION: "3.10"
         run: |
-          pip install kivy_garden.mapview --break-system-packages 2>/dev/null || true
           buildozer android debug 2>&1 | tee ../build.log
 
       - name: Upload APK
