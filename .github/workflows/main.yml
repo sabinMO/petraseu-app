@@ -43,8 +43,21 @@ jobs:
 
       - name: Setup Android SDK complet
         run: |
-          SDK_ROOT=~/.buildozer/android/platform/android-sdk
-          mkdir -p "$SDK_ROOT"
+          SDK_ROOT=$HOME/.buildozer/android/platform/android-sdk
+          mkdir -p "$SDK_ROOT/cmdline-tools"
           wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O /tmp/cmdline-tools.zip
+          rm -rf /tmp/cmdline-tools-extracted
+          mkdir -p /tmp/cmdline-tools-extracted
+          unzip -o -q /tmp/cmdline-tools.zip -d /tmp/cmdline-tools-extracted
           rm -rf "$SDK_ROOT/cmdline-tools/latest"
-          unzip -o -q /tmp/cmdline-tools.zip -d
+          mv /tmp/cmdline-tools-extracted/cmdline-tools "$SDK_ROOT/cmdline-tools/latest"
+          SDKMANAGER="$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+          mkdir -p ~/.android
+          touch ~/.android/repositories.cfg
+          yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses || true
+          yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" \
+            "platforms;android-33" \
+            "build-tools;33.0.3" \
+            "platform-tools" || true
+          mkdir -p "$SDK_ROOT/tools/bin"
+          ln -sf "$SDKMANAGER" "$SDK_ROOT/tools/bin/sdkmanager"
