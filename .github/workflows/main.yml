@@ -31,8 +31,7 @@ jobs:
           pip install --upgrade pip
           pip install buildozer==1.5.0
           pip install cython==0.29.33
-          pip install python-for-android==2023.9.16
-          pip install legacy-cgi
+          pip install git+https://github.com/kivy/python-for-android.git@stable
 
       - name: Cache buildozer
         uses: actions/cache@v3
