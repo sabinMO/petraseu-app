@@ -12,60 +12,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Python 3.11
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-
-      - name: Instaleaza dependinte sistem
+      - name: Build APK in Docker
         run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            git zip unzip openjdk-17-jdk \
-            autoconf libtool pkg-config \
-            zlib1g-dev libncurses5-dev libncursesw5-dev \
-            libffi-dev libssl-dev
-
-      - name: Instaleaza buildozer
-        run: |
-          pip install --upgrade pip
-          pip install buildozer==1.5.0
-          pip install cython==0.29.33
-          pip install python-for-android==2023.9.16
-
-      - name: Cache buildozer
-        uses: actions/cache@v3
-        with:
-          path: ~/.buildozer
-          key: buildozer-${{ runner.os }}-py311-${{ hashFiles('client/buildozer.spec') }}
-          restore-keys: |
-            buildozer-${{ runner.os }}-py311-
-
-      - name: Setup Android SDK
-        run: |
-          SDK_ROOT=$HOME/.buildozer/android/platform/android-sdk
-          mkdir -p "$SDK_ROOT/cmdline-tools"
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O /tmp/cmdline-tools.zip
-          rm -rf /tmp/cmdline-tools-extracted
-          mkdir -p /tmp/cmdline-tools-extracted
-          unzip -o -q /tmp/cmdline-tools.zip -d /tmp/cmdline-tools-extracted
-          rm -rf "$SDK_ROOT/cmdline-tools/latest"
-          mv /tmp/cmdline-tools-extracted/cmdline-tools "$SDK_ROOT/cmdline-tools/latest"
-          SDKMANAGER="$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
-          mkdir -p ~/.android
-          touch ~/.android/repositories.cfg
-          yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses || true
-          yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" \
-            "platforms;android-33" \
-            "build-tools;33.0.3" \
-            "platform-tools" || true
-          mkdir -p "$SDK_ROOT/tools/bin"
-          ln -sf "$SDKMANAGER" "$SDK_ROOT/tools/bin/sdkmanager"
-
-      - name: Build APK
-        working-directory: client
-        run: |
-          buildozer android debug 2>&1 | tee ../build.log
+          docker run --rm \
+            -v ${{ github.workspace }}/client:/home/user/hostcwd \
+            kivy/buildozer:latest \
+            android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -74,4 +26,3 @@ jobs:
           name: pe-traseu-apk
           path: |
             client/bin/*.apk
-            build.log
