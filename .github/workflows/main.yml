@@ -66,16 +66,14 @@ jobs:
       - name: Forteaza Python 3.11 in p4a
         run: |
           P4A_DIR=$(python -c "import pythonforandroid; import os; print(os.path.dirname(pythonforandroid.__file__))")
-          RECIPE="$P4A_DIR/recipes/python3/recipe.py"
-          echo "=== Inainte ==="
-          grep -E "version\s*=" "$RECIPE" | head -5
-          
-          # Inlocuieste versiunea
+          echo "P4A dir: $P4A_DIR"
+          find "$P4A_DIR" -name "recipe.py" | grep python3 | head -5
+          RECIPE=$(find "$P4A_DIR" -name "recipe.py" | grep python3 | head -1)
+          echo "Recipe: $RECIPE"
+          cat "$RECIPE" | grep -E "version|url" | head -10
           sed -i "s/version = ['\"][0-9.]*['\"]/version = '3.11.9'/g" "$RECIPE"
-          sed -i "s/url = .*cpython.*/url = 'https:\/\/www.python.org\/ftp\/python\/{version}\/Python-{version}.tgz'/g" "$RECIPE"
-          
           echo "=== Dupa ==="
-          grep -E "version\s*=|url\s*=" "$RECIPE" | head -10
+          cat "$RECIPE" | grep -E "version|url" | head -10
 
       - name: Build APK
         working-directory: client
