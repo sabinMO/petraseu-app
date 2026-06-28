@@ -12,19 +12,30 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Pregateste SDK pentru Docker
+        run: |
+          SDK_ROOT=$HOME/.buildozer/android/platform/android-sdk
+          mkdir -p "$SDK_ROOT/cmdline-tools"
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O /tmp/cmdline-tools.zip
+          unzip -o -q /tmp/cmdline-tools.zip -d /tmp/ct
+          mv /tmp/ct/cmdline-tools "$SDK_ROOT/cmdline-tools/latest"
+          SDKMANAGER="$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+          mkdir -p "$SDK_ROOT/licenses"
+          echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > "$SDK_ROOT/licenses/android-sdk-license"
+          echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> "$SDK_ROOT/licenses/android-sdk-license"
+          yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses || true
+          yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" \
+            "platforms;android-33" \
+            "build-tools;33.0.3" \
+            "platform-tools" || true
+          mkdir -p "$SDK_ROOT/tools/bin"
+          ln -sf "$SDKMANAGER" "$SDK_ROOT/tools/bin/sdkmanager"
+
       - name: Build APK in Docker
         run: |
-          # Pre-accepta licentele SDK
-          mkdir -p $HOME/.android
-          mkdir -p $HOME/.buildozer/android/platform/android-sdk/licenses
-          echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > $HOME/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-          echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> $HOME/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-          echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" >> $HOME/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-
           docker run --rm \
             -v ${{ github.workspace }}/client:/home/user/hostcwd \
             -v $HOME/.buildozer:/home/user/.buildozer \
-            -v $HOME/.android:/home/user/.android \
             kivy/buildozer:latest \
             android debug
 
