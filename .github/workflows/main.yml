@@ -12,10 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Python
+      - name: Setup Python 3.11
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Instaleaza dependinte sistem
         run: |
@@ -26,22 +26,22 @@ jobs:
             zlib1g-dev libncurses5-dev libncursesw5-dev \
             libffi-dev libssl-dev
 
-      - name: Instaleaza buildozer si dependinte Python
+      - name: Instaleaza buildozer
         run: |
           pip install --upgrade pip
           pip install buildozer==1.5.0
           pip install cython==0.29.33
-          pip install git+https://github.com/kivy/python-for-android.git@stable
+          pip install python-for-android==2023.9.16
 
       - name: Cache buildozer
         uses: actions/cache@v3
         with:
           path: ~/.buildozer
-          key: buildozer-${{ runner.os }}-${{ hashFiles('client/buildozer.spec') }}
+          key: buildozer-${{ runner.os }}-py311-${{ hashFiles('client/buildozer.spec') }}
           restore-keys: |
-            buildozer-${{ runner.os }}-
+            buildozer-${{ runner.os }}-py311-
 
-      - name: Setup Android SDK complet
+      - name: Setup Android SDK
         run: |
           SDK_ROOT=$HOME/.buildozer/android/platform/android-sdk
           mkdir -p "$SDK_ROOT/cmdline-tools"
@@ -61,23 +61,6 @@ jobs:
             "platform-tools" || true
           mkdir -p "$SDK_ROOT/tools/bin"
           ln -sf "$SDKMANAGER" "$SDK_ROOT/tools/bin/sdkmanager"
-
-      - name: Forteaza Python 3.11 in p4a
-        run: |
-          P4A_DIR=$(python -c "import pythonforandroid; import os; print(os.path.dirname(pythonforandroid.__file__))")
-          echo "P4A dir: $P4A_DIR"
-          find "$P4A_DIR" -name "recipe.py" | grep python3 | head -5
-          RECIPE=$(find "$P4A_DIR" -name "recipe.py" | grep python3 | head -1)
-          echo "Recipe: $RECIPE"
-          cat "$RECIPE" | grep -E "version|url" | head -10
-          sed -i "s/version = ['\"][0-9.]*['\"]/version = '3.11.9'/g" "$RECIPE"
-          echo "=== Dupa ==="
-          cat "$RECIPE" | grep -E "version|url" | head -10
-
-      - name: Build APK
-        working-directory: client
-        run: |
-          buildozer android debug 2>&1 | tee ../build.log
 
       - name: Build APK
         working-directory: client
