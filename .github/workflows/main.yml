@@ -63,6 +63,19 @@ jobs:
           mkdir -p "$SDK_ROOT/tools/bin"
           ln -sf "$SDKMANAGER" "$SDK_ROOT/tools/bin/sdkmanager"
 
+      - name: Forteaza Python 3.11 in p4a
+        run: |
+          P4A_DIR=$(python -c "import pythonforandroid; import os; print(os.path.dirname(pythonforandroid.__file__))")
+          echo "p4a dir: $P4A_DIR"
+          # Seteaza versiunea Python in reteta p4a
+          sed -i 's/version = "3\.[0-9]*/version = "3.11/g' "$P4A_DIR/recipes/python3/recipe.py" || true
+          grep "version" "$P4A_DIR/recipes/python3/recipe.py" | head -5
+
+      - name: Build APK
+        working-directory: client
+        run: |
+          buildozer android debug 2>&1 | tee ../build.log
+
       - name: Build APK
         working-directory: client
         run: |
