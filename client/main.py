@@ -922,14 +922,15 @@ class MuntomaniApp(MDApp):
         ecran.ids.eticheta_eroare_creare.text = "Se creează grupul..."
         puncte_traseu = ecran.puncte_traseu()  # None dacă nu s-a completat traseul
 
-        def cere():
+    def cere():
             try:
                 date = api.creeaza_grup(nume_grup, nume_organizator)
                 Clock.schedule_once(lambda dt: self._grup_creat(date, nume_grup, puncte_traseu))
             except api.EroareRetea as e:
-                Clock.schedule_once(lambda dt: setattr(ecran.ids.eticheta_eroare_creare, "text", str(e)))
+                eroare = str(e)
+                Clock.schedule_once(lambda dt: setattr(ecran.ids.eticheta_eroare_creare, "text", eroare))
 
-        threading.Thread(target=cere, daemon=True).start()
+    threading.Thread(target=cere, daemon=True).start()
 
     def _grup_creat(self, date, nume_grup, puncte_traseu):
         self.cod_grup = date["cod_grup"]
@@ -962,22 +963,23 @@ class MuntomaniApp(MDApp):
 
         ecran.ids.eticheta_eroare_alaturare.text = "Se trimite cererea..."
 
-        def cere():
-            try:
-                date = api.alatura_grup(cod, nume)
-                Clock.schedule_once(lambda dt: self._alaturat_cu_succes(date, cod))
-            except api.EroareRetea as e:
-                Clock.schedule_once(lambda dt: setattr(ecran.ids.eticheta_eroare_alaturare, "text", str(e)))
+def cere():
+        try:
+            date = api.alatura_grup(cod, nume)
+            Clock.schedule_once(lambda dt: self._alaturat_cu_succes(date, cod))
+        except api.EroareRetea as e:
+            eroare = str(e)
+            Clock.schedule_once(lambda dt: setattr(ecran.ids.eticheta_eroare_alaturare, "text", eroare))
 
         threading.Thread(target=cere, daemon=True).start()
 
-    def _alaturat_cu_succes(self, date, cod):
-        self.cod_grup = cod
-        self.id_membru = date["id_membru"]
-        self.token_organizator = None  # nu ești organizator
-        self.culoare_proprie = date["culoare"]
-        self.nume_grup = date["nume_grup"]
-        self.deschide_ecran("harta")
+def _alaturat_cu_succes(self, date, cod):
+    self.cod_grup = cod
+    self.id_membru = date["id_membru"]
+    self.token_organizator = None  # nu ești organizator
+    self.culoare_proprie = date["culoare"]
+    self.nume_grup = date["nume_grup"]
+    self.deschide_ecran("harta")
 
     # ---------------------------- Chat ----------------------------
 

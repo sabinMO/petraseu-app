@@ -1,90 +1,44 @@
-name: Build Pe Traseu APK
+name: Build APK
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
-  build-apk:
+  build:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: "3.11"
 
-      - name: Instaleaza dependinte sistem
+      - name: Install system packages
         run: |
           sudo apt-get update
           sudo apt-get install -y \
             git zip unzip openjdk-17-jdk \
-            autoconf libtool pkg-config \
-            zlib1g-dev libncurses5-dev libncursesw5-dev \
-            libffi-dev libssl-dev
+            autoconf automake libtool \
+            pkg-config zlib1g-dev
 
-      - name: Instaleaza buildozer si dependinte Python
+      - name: Install Buildozer
         run: |
-          pip install --upgrade pip
-          pip install buildozer==1.5.0
-          pip install cython==0.29.33
-
-      - name: Cache buildozer
-        uses: actions/cache@v3
-        with:
-          path: ~/.buildozer
-          key: buildozer-${{ runner.os }}-${{ hashFiles('client/buildozer.spec') }}
-          restore-keys: |
-            buildozer-${{ runner.os }}-
-
-      - name: Setup Android SDK complet
-        run: |
-          SDK_ROOT=~/.buildozer/android/platform/android-sdk
-          mkdir -p "$SDK_ROOT"
-
-          # Descarca cmdline-tools
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O /tmp/cmdline-tools.zip
-          mkdir -p "$SDK_ROOT/cmdline-tools"
-          unzip -q /tmp/cmdline-tools.zip -d "$SDK_ROOT/cmdline-tools"
-          mv "$SDK_ROOT/cmdline-tools/cmdline-tools" "$SDK_ROOT/cmdline-tools/latest" 2>/dev/null || true
-
-          SDKMANAGER="$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
-
-          # Accepta licente
-          mkdir -p ~/.android
-          touch ~/.android/repositories.cfg
-          yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses || true
-
-          # Instaleaza componentele necesare
-          yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" \
-            "platforms;android-33" \
-            "build-tools;33.0.3" \
-            "platform-tools" || true
-
-          # Symlink pentru calea veche tools/bin/sdkmanager
-          mkdir -p "$SDK_ROOT/tools/bin"
-          ln -sf "$SDKMANAGER" "$SDK_ROOT/tools/bin/sdkmanager"
-
-          echo "=== Verificare ==="
-          ls -la "$SDK_ROOT/tools/bin/"
-          ls -la "$SDK_ROOT/build-tools/" || true
-          "$SDKMANAGER" --sdk_root="$SDK_ROOT" --list | head -20 || true
+          python -m pip install --upgrade pip
+          pip install buildozer cython
 
       - name: Build APK
         working-directory: client
-        env:
-          P4A_PYTHON_VERSION: "3.10"
         run: |
-          buildozer android debug 2>&1 | tee ../build.log
+          buildozer android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: pe-traseu-apk
-          path: |
-            client/bin/*.apk
-            build.log
+          path: client/bin/*.apk

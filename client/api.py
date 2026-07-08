@@ -80,7 +80,7 @@ def raporteaza_urs(cod, id_membru):
     return _trateaza(lambda: requests.post(
         f"{SERVER_URL}/grupuri/{cod}/urs",
         json={"id_membru": id_membru, "text": "urs"},
-        timeout=TIMEOUT,
+        timeout=TIMEOUT
     ))
 
 
