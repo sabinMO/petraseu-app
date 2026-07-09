@@ -11,7 +11,7 @@ import requests
 # IMPORTANT: înlocuiește cu adresa serverului tău odată ce îl pui online
 # (vezi README.md -> "Pune serverul online"). Pentru testare pe calculator,
 # dacă rulezi serverul local, poți lăsa "http://127.0.0.1:8000".
-SERVER_URL = "http://127.0.0.1:8000"
+SERVER_URL = "http://192.168.100.74:8000"
 
 TIMEOUT = 8  # secunde, ca aplicația să nu rămână blocată dacă nu e semnal
 

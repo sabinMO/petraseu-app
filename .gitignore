@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.venv/
+
+# Buildozer
+client/.buildozer/
+client/bin/
+client/build/
+client/buildlog.txt
+
+# Server
+server/venv/
+
+# VS Code
+.vscode/
+
+# Android
+*.apk
+*.aab

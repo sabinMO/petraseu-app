@@ -315,3 +315,13 @@ def sterge_traseu(cod: str, date: StergereGrup):
         raise HTTPException(403, "Doar organizatorul poate șterge traseul")
     grup["traseu"] = None
     return {"ok": True}
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True,
+    )

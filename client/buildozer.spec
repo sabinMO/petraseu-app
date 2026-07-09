@@ -11,7 +11,7 @@ icon.filename = %(source.dir)s/assets/icon.png
 
 version = 0.1
 
-requirements = python3,kivy==2.2.1,kivymd==1.1.1,plyer,requests,certifi,urllib3,idna,charset_normalizer,legacy-cgi
+requirements = python3,kivy,https://github.com/kivymd/KivyMD/archive/master.zip,materialyoucolor,plyer,requests
 orientation = portrait
 fullscreen = 0
 
@@ -20,7 +20,7 @@ android.api = 33
 android.minapi = 26
 android.ndk = 25b
 android.archs = arm64-v8a
-p4a.python_version = 3.11
+p4a.python_version = 3.10
 
 [buildozer]
 log_level = 2
